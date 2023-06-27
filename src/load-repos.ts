@@ -90,7 +90,7 @@ const load = async () => {
   const organisations = await getOrganisations(profile.id);
 
   for (const organisation of organisations.value) {
-    loadOrganisation(organisation);
+    await loadOrganisation(organisation);
   }
 };
 
