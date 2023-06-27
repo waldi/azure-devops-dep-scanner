@@ -20,18 +20,26 @@ const fileExists = (path) =>
     .then(() => true)
     .catch(() => false);
 
+const tryParseJson = (string) => {
+  try {
+    return JSON.parse(string);
+  } catch (err) {
+    return null;
+  }
+};
+
 const createAuditNpm = async (directory) => {
   const res = await execa("npm", ["audit", "--json"], { cwd: directory }).catch((err) => {
     return err;
   });
-  return JSON.parse(res.stdout);
+  return tryParseJson(res.stdout);
 };
 
 const createAuditYarn = async (directory) => {
   const res = await execa("yarn", ["audit", "--json"], { cwd: directory }).catch((err) => {
     return err;
   });
-  return JSON.parse(res.stdout);
+  return tryParseJson(res.stdout);
 };
 
 const createAudit = async (directory) => {
@@ -51,7 +59,7 @@ const audit = async () => {
 
   const results = [];
 
-  const queue = new PQueue({ concurrency: 50, autoStart: false });
+  const queue = new PQueue({ concurrency: 10, autoStart: false });
 
   for (const lockFile of relativeLockFilePaths) {
     queue.add(async () => {

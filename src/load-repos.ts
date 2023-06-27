@@ -1,6 +1,7 @@
 import { mkdirp } from "mkdirp";
 import fs from "fs/promises";
 import path from "path";
+import PQueue from "p-queue";
 
 import {
   getProjects,
@@ -89,9 +90,15 @@ const load = async () => {
   const profile = await getProfile();
   const organisations = await getOrganisations(profile.id);
 
+  const queue = new PQueue({ concurrency: 10, autoStart: false });
+
   for (const organisation of organisations.value) {
-    await loadOrganisation(organisation);
+    queue.add(() => loadOrganisation(organisation));
   }
+
+  queue.start();
+
+  await queue.onIdle();
 };
 
 load();
