@@ -1,0 +1,27 @@
+{
+  "name": "af-js-dep-scanner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "load-repos": "tsx ./src/load-repos.ts",
+    "load-repos:debug": "tsx --inspect-brk ./src/load-repos.ts",
+    "audit": "tsx ./src/audit.ts",
+    "audit:debug": "tsx --inspect-brk ./src/audit.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "azure-devops-node-api": "^12.0.0",
+    "execa": "^7.1.1",
+    "mkdirp": "^3.0.1",
+    "p-queue": "^7.3.4",
+    "tsx": "^3.12.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.1.4",
+    "typescript": "^5.0.4"
+  }
+}

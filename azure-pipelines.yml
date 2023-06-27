@@ -1,0 +1,33 @@
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "20"
+    displayName: "Install Node.js"
+
+  - script: |
+      npm ci
+    displayName: "npm ci"
+    env:
+      NODE_ENV: $(NODE_ENV)
+
+  - script: |
+      npm run load-repos
+    displayName: "npm load-repos"
+    env:
+      AZURE_PERSONAL_ACCESS_TOKEN: $(AZURE_PERSONAL_ACCESS_TOKEN)
+
+  - script: |
+      npm run audit
+    displayName: "npm audit"
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish build"
+    inputs:
+      PathtoPublish: "output/"
+      ArtifactName: "output"
