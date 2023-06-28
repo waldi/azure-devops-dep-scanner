@@ -32,19 +32,32 @@ const createAuditNpm = async (directory) => {
   const res = await execa("npm", ["audit", "--json"], { cwd: directory }).catch((err) => {
     return err;
   });
-  return tryParseJson(res.stdout);
+  const data = tryParseJson(res.stdout);
+  if (!data) return null;
+  return {
+    type: "npm",
+    data,
+  };
 };
 
 const createAuditYarn = async (directory) => {
   const res = await execa("yarn", ["audit", "--json"], { cwd: directory }).catch((err) => {
+    debugger;
     return err;
   });
-  return tryParseJson(res.stdout);
+
+  const data = res.stdout.split("\n").map((line) => tryParseJson(line));
+  if (!data) return null;
+
+  return {
+    type: "yarn",
+    data,
+  };
 };
 
 const createAudit = async (directory) => {
-  if (fileExists(path.join(directory, "package-lock.json"))) return createAuditNpm(directory);
-  if (fileExists(path.join(directory, "yarn.lock"))) return createAuditYarn(directory);
+  if (await fileExists(path.join(directory, "package-lock.json"))) return createAuditNpm(directory);
+  if (await fileExists(path.join(directory, "yarn.lock"))) return createAuditYarn(directory);
   return null;
 };
 
@@ -59,7 +72,7 @@ const audit = async () => {
 
   const results = [];
 
-  const queue = new PQueue({ concurrency: 10, autoStart: false });
+  const queue = new PQueue({ concurrency: 15, autoStart: false });
 
   for (const lockFile of relativeLockFilePaths) {
     queue.add(async () => {
